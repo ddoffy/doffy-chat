@@ -60,7 +60,7 @@ export default function Home() {
       }
     }
 
-    let body = { assistant: assistantRole };
+    const body = { assistant: assistantRole };
 
     try {
       const res = await fetch(msg_uri, {
@@ -84,7 +84,7 @@ export default function Home() {
   const createARoom = async (msg) => {
     const msg_uri = "/api/create_room";
   
-    let body = { question: msg, assistant: assistantRole };
+    const body = { question: msg, assistant: assistantRole };
 
     try {
       const res = await fetch(msg_uri, {
