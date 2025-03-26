@@ -25,7 +25,7 @@ export default function Home() {
       setResponse((prev) => prev + event.data.replace(/\n/g, "\n> "));
     };
 
-    eventSource.onclose = () => {
+    eventSource.close = () => {
       setIsLoading(false);
     };
 
@@ -75,7 +75,7 @@ export default function Home() {
         throw new Error("Failed to update assistant");
       }
     } catch (error) {
-      setResponse((prev) => prev + "Failed to update assistant \n\n");
+      setResponse((prev) => prev + "Failed to update assistant" + error + "\n\n");
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +106,7 @@ export default function Home() {
         return jsonData.room_id;
       }
     } catch (error) {
-      setResponse((prev) => prev + "Failed to create a room \n\n");
+      setResponse((prev) => prev + "Failed to create a room " + error + "\n\n");
     }
   };
 
@@ -144,7 +144,7 @@ export default function Home() {
 
       await streaming(jsonData?.room_id ?? id);
     } catch (error) {
-      setResponse("Failed to send message");
+      setResponse((prev)=> prev + "Failed to send message: " + error + "\n\n");
     } finally {
       setMessage("");
     }
@@ -157,7 +157,7 @@ export default function Home() {
           <div className="prose prose-slate max-w-none">
             <ReactMarkdown
               components={{
-                h2: ({ node, ...props }) => {
+                h2: ({ _, ...props }) => {
                   const content = props.children?.toString() || "";
                   if (content.includes("User:")) {
                     return (
@@ -176,7 +176,7 @@ export default function Home() {
                   }
                   return <h2 {...props} />;
                 },
-                blockquote: ({ node, ...props }) => {
+                blockquote: ({ _, ...props }) => {
                   return (
                     <div
                       className="pl-4 border-l-4 border-emerald-300 my-2 text-gray-800"
