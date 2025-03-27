@@ -6,7 +6,10 @@ const nextConfig: NextConfig = {
   },
   /* config options here */
   async rewrites() {
-    const api_url = process.env.API_URL || "http://localhost:8089";
+    const api_url = process.env.API_URL;
+    if (!api_url) {
+      throw new Error("API_URL is not set");
+    }
     return [
       {
         source: "/api/:path*",
