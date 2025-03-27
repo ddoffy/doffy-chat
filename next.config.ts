@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   },
   /* config options here */
   async rewrites() {
-    const api_url = process.env.API_URL || "rust-chat:8089";
+    const api_url = process.env.API_URL || "http://rust-chat:8089";
     if (!api_url) {
       throw new Error("API_URL is not set");
     }
