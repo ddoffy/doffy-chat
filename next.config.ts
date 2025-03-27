@@ -6,10 +6,11 @@ const nextConfig: NextConfig = {
   },
   /* config options here */
   async rewrites() {
+    const api_url = process.env.API_URL || "http://localhost:8089";
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8089/:path*", // Proxy to Go-Zero
+        destination: `${api_url}/:path*`, // Proxy to Go-Zero
       },
     ];
   },
