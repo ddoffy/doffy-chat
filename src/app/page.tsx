@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function Home() {
@@ -10,8 +10,9 @@ export default function Home() {
   const [assistantRole, setAssistantRole] = useState(
     "You are an English professor/teacher. You are going to correct my grammar and make my tone sound natural and native. I also like using American slang. I am Vietnamese, so you should explain to me why I was wrong with that grammar, then point me to how to use it correctly. With strange words, you should explain it in Vietnamese"
   );
+  const messageInputRef = useRef(null);
 
-  const streaming = async (room_id) => {
+  const streaming = async (room_id: string) => {
     setResponse((prev) => prev + "   \n\n\n ## Assistant:     \n\n");
 
     if (!room_id) {
@@ -34,13 +35,15 @@ export default function Home() {
     eventSource.onopen = () => {
       console.log("Connection opened");
     };
+    
+    return eventSource;
   };
 
-  const updateAssistant = async (e) => {
+  const updateAssistant = async (e: an) => {
     // endpoint to update assistant
     // POST /api/chat/{id}/set_assistant
-    e.preventDefault();
     setIsLoading(true);
+    e.preventDefault();
     let msg_uri = `/api/chat/${id}/set_assistant`;
 
     if (!id) {
@@ -49,7 +52,7 @@ export default function Home() {
       );
       if (room_id) {
         msg_uri = `/api/chat/${room_id}/set_assistant`;
-        await streaming(room_id);
+        const eventSource = await streaming(room_id);
       } else {
         setResponse((prev) => prev + "Failed to create a room \n\n");
         setIsLoading(false);
@@ -80,7 +83,7 @@ export default function Home() {
     }
   };
 
-  const createARoom = async (msg) => {
+  const createARoom = async (msg: string) => {
     const msg_uri = "/api/create_room";
 
     const body = { question: msg, assistant: assistantRole };
@@ -109,7 +112,7 @@ export default function Home() {
     }
   };
 
-  const send_message = async (room_id, msg) => {
+  const send_message = async (room_id: string, msg: string) => {
     const msg_uri = `/api/room/${room_id}/message`;
 
     const body = { message: msg };
@@ -131,13 +134,13 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     setResponse((prev) => prev + "   \n\n\n ## User: " + message + "   \n\n");
-    let msg_uri = "/api/create_room";
+    // let msg_uri = "/api/create_room";
 
-    var body = { question: message, assistant: assistantRole };
+    // var body = { question: message, assistant: assistantRole };
     let room_id = id;
     if (id) {
       await send_message(id, message);
@@ -147,10 +150,19 @@ export default function Home() {
 
     setMessage("");
 
-    await streaming(room_id);
+    const eventSource = await streaming(room_id);
 
     setIsLoading(false);
+    
+    // Focus back on the textarea after sending the message
+    setTimeout(() => {
+      messageInputRef.current?.focus();
+    },0);
   };
+
+  useEffect(() => {
+     messageInputRef.current?.focus();
+  }, [messageInputRef]);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-4 pb-20 gap-8 sm:p-10 w-full font-[family-name:var(--font-geist-sans)]">
@@ -243,6 +255,7 @@ export default function Home() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 disabled={isLoading}
+                ref={messageInputRef}
                 placeholder="Type your message here..."
                 className="w-full p-3 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
                 onKeyDown={(e) => {
