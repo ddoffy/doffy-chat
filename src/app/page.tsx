@@ -52,7 +52,7 @@ export default function Home() {
       );
       if (room_id) {
         msg_uri = `/api/chat/${room_id}/set_assistant`;
-        const eventSource = await streaming(room_id);
+        _ = await streaming(room_id);
       } else {
         setResponse((prev) => prev + "Failed to create a room \n\n");
         setIsLoading(false);
@@ -134,8 +134,7 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setResponse((prev) => prev + "   \n\n\n ## User: " + message + "   \n\n");
     // let msg_uri = "/api/create_room";
@@ -150,7 +149,7 @@ export default function Home() {
 
     setMessage("");
 
-    const eventSource = await streaming(room_id);
+    _ = await streaming(room_id);
 
     setIsLoading(false);
     
