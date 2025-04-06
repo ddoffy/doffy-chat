@@ -270,6 +270,13 @@ export default function Home() {
                 disabled={isLoading}
                 className="absolute bottom-3 right-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transition-colors disabled:bg-blue-300"
                 aria-label="Send message"
+                onClick={(e) =>  {
+                  if (message.trim() === "") {
+                    return;
+                  }
+                  e.preventDefault();
+                  handleSubmit();
+                }}
               >
                 {isLoading ? "..." : "Send"}
               </button>
