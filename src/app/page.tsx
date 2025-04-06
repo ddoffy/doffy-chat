@@ -12,7 +12,7 @@ export default function Home() {
   );
   const messageInputRef = useRef(null);
 
-  const streaming = async (room_id: string) => {
+  const streaming = async (room_id: string): EventSource => {
     setResponse((prev) => prev + "   \n\n\n ## Assistant:     \n\n");
 
     if (!room_id) {
@@ -39,11 +39,10 @@ export default function Home() {
     return eventSource;
   };
 
-  const updateAssistant = async (e: an) => {
+  const updateAssistant = async () => {
     // endpoint to update assistant
     // POST /api/chat/{id}/set_assistant
     setIsLoading(true);
-    e.preventDefault();
     let msg_uri = `/api/chat/${id}/set_assistant`;
 
     if (!id) {
@@ -52,7 +51,7 @@ export default function Home() {
       );
       if (room_id) {
         msg_uri = `/api/chat/${room_id}/set_assistant`;
-        _ = await streaming(room_id);
+        await streaming(room_id);
       } else {
         setResponse((prev) => prev + "Failed to create a room \n\n");
         setIsLoading(false);
@@ -83,7 +82,7 @@ export default function Home() {
     }
   };
 
-  const createARoom = async (msg: string) => {
+  const createARoom = async (msg: string) : Promise<string | undefined> => {
     const msg_uri = "/api/create_room";
 
     const body = { question: msg, assistant: assistantRole };
@@ -110,6 +109,8 @@ export default function Home() {
     } catch (error) {
       setResponse((prev) => prev + "Failed to create a room " + error + "\n\n");
     }
+
+    return undefined;
   };
 
   const send_message = async (room_id: string, msg: string) => {
@@ -140,7 +141,7 @@ export default function Home() {
     // let msg_uri = "/api/create_room";
 
     // var body = { question: message, assistant: assistantRole };
-    let room_id = id;
+    let room_id: string = id;
     if (id) {
       await send_message(id, message);
     } else {
@@ -149,7 +150,7 @@ export default function Home() {
 
     setMessage("");
 
-    _ = await streaming(room_id);
+    await streaming(room_id);
 
     setIsLoading(false);
     
@@ -223,7 +224,7 @@ export default function Home() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  updateAssistant(e);
+                  updateAssistant();
                 }
               }}
             />
@@ -260,7 +261,7 @@ export default function Home() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    handleSubmit(e);
+                    handleSubmit();
                   }
                 }}
               />
