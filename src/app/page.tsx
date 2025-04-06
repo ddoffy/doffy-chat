@@ -12,7 +12,7 @@ export default function Home() {
   );
   const messageInputRef = useRef(null);
 
-  const streaming = async (room_id: string): EventSource => {
+  const streaming = async (room_id: string): Promise<EventSource> => {
     setResponse((prev) => prev + "   \n\n\n ## Assistant:     \n\n");
 
     if (!room_id) {
